@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Training Roadmap Tool</title>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="loading">
+
+<header class="top">
+  <a class="brand" href="#home" id="brand-home" aria-label="Service Training Roadmap Tool, go to the home page and start again">
+    <div class="brand-mark" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
+    <div class="brand-text">
+      <h1>Service Training Roadmap Tool</h1>
+      <p>A nifty tool to help you craft your training roadmap based on what you need.</p>
+    </div>
+  </a>
+  <nav class="tabs" role="tablist" aria-label="Main views">
+    <button role="tab" id="tab-home" aria-selected="true" data-view="home">Home</button>
+    <button role="tab" id="tab-guide" aria-selected="false" data-view="guide">How to use</button>
+    <button role="tab" id="tab-presets" aria-selected="false" data-view="presets">Preset pathways</button>
+  </nav>
+  <div class="header-right">
+    <button class="pathway-btn" id="pathway-open"><span>My pathway</span><span class="pathway-count" id="pathway-count">0</span></button>
+    <div class="theme-toggle">
+      <span id="theme-label">Light mode</span>
+      <button class="switch" id="theme-switch" role="switch" aria-checked="false" aria-label="Toggle dark mode"><span class="knob"></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="loading-panel" role="status"><span class="spinner" aria-hidden="true"></span>Loading the programme catalogue&hellip;</div>
+<div class="loading-slow" role="alert">
+  <p><strong>This is taking longer than usual.</strong></p>
+  <p style="margin-top:6px;">If this message stays, the page's code may be blocked by the server or the network. Please ask your ICT team to check that the server allows this site's own files to run (app.js), and see the Troubleshooting section of the README.</p>
+</div>
+<noscript><div style="max-width:620px;margin:40px auto;padding:20px;border:1px solid #ccc;border-radius:8px;">This site needs JavaScript. Please turn it on in your browser.</div></noscript>
+<div class="error-panel" role="alert">
+  <h2>The programme catalogue could not be loaded</h2>
+  <p id="load-error-msg"></p>
+  <p>If you have the Excel file, you can open it here to view the roadmap in this browser.</p>
+  <div class="btn-row"><button class="btn btn-primary" data-pick-file>Open an Excel file</button></div>
+</div>
+
+<main>
+
+  <!-- HOME: hero, then the full catalogue revealed as you scroll -->
+  <section class="view active" id="view-home">
+    <div class="home-hero">
+      <div class="v0-badge">We do not collect any data from this website.</div>
+      <h2 class="v0-headline">Find the right service training for you</h2>
+      <p class="home-sub">Browse every active programme, pick a ready-made pathway, or follow the guide to work out which competencies and levels fit your role.</p>
+      <div class="home-ctas">
+        <button class="btn btn-primary btn-lg" data-scroll-catalogue>Show me all the available programmes <span aria-hidden="true">&darr;</span></button>
+      </div>
+      <div class="home-links">
+        <button class="v0-pill" data-goto="guide">How to use this roadmap</button>
+        <button class="v0-pill" data-goto="presets">View preset pathways</button>
+      </div>
+      <div class="home-stats" id="home-stats"></div>
+      <button class="scroll-hint" data-scroll-catalogue aria-label="Scroll to the catalogue"><span>Scroll to explore</span><span class="chev" aria-hidden="true"></span></button>
+    </div>
+
+    <div id="catalogue" class="catalogue">
+      <div class="hero reveal" style="margin-bottom: 24px;">
+        <h2 style="font-size:28px;">All available programmes</h2>
+        <p>Every active programme in one place. Search or filter to narrow it down, or leave everything as is to see the whole catalogue grouped by competency.</p>
+        <p style="margin-top:10px;"><button class="btn btn-secondary btn-sm" data-goto="matrix">View the full competency &amp; level matrix (for HR) &#8599;</button></p>
+      </div>
+      <div class="browse-layout">
+        <div class="filters-toggle-wrap"><button class="btn btn-secondary btn-sm" id="filters-toggle" aria-expanded="false" aria-controls="browse-sidebar">Show filters</button></div>
+        <aside class="browse-sidebar" id="browse-sidebar"></aside>
+        <div class="browse-main">
+          <div class="browse-topbar">
+            <div class="search-field">
+              <span class="search-icon" aria-hidden="true">&#128269;</span>
+              <input type="text" id="browse-search" placeholder="Search programmes by name">
+            </div>
+            <label class="sort-field">Sort
+              <select id="browse-sort">
+                <option value="competency">By competency</option>
+                <option value="level">By level</option>
+                <option value="az">A to Z</option>
+              </select>
+            </label>
+            <button class="btn btn-secondary btn-sm" id="browse-reset">Reset filters</button>
+          </div>
+          <div class="browse-pills" id="browse-pills"></div>
+          <div class="filter-summary" id="filter-summary" hidden></div>
+          <p class="result-count" id="browse-count"></p>
+          <div class="browse-grid" id="browse-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-presets">
+    <div class="hero" style="margin-bottom: 28px;">
+      <h2 style="font-size:26px;">Preset pathways</h2>
+      <p>Pick a ready-made list of programmes. Choose by your role band if you want programmes suited to your designation, or by skill if you want to build one specific skill.</p>
+    </div>
+    <div class="browse-pills" id="preset-filter" role="group" aria-label="Show presets"></div>
+    <div id="preset-groups"></div>
+  </section>
+
+  <!-- HOW TO USE -->
+  <section class="view" id="view-guide">
+    <div class="subnav" role="tablist" aria-label="How to use sections">
+      <button role="tab" data-goto="guide" aria-selected="true">Step-by-step guide</button>
+      <button role="tab" data-goto="cases" aria-selected="false">Case studies</button>
+    </div>
+    <div class="hero" style="margin-bottom: 28px;">
+      <h2 style="font-size:28px;">How to use this roadmap</h2>
+      <p>Follow these steps to find the programmes that fit your work. The sections below walk you through each one, and you can jump straight to matching programmes as you go.</p>
+    </div>
+    <ol class="g-steps" id="guide-steps"></ol>
+    <div id="guide-tips"></div>
+
+    <div class="g-section">
+      <div class="g-section-head"><span class="g-badge">Step 1</span><h3>Service Functions and Areas of Work</h3></div>
+      <p class="g-lead">There are six Service Functions, each with its own Areas of Work. Depending on the Areas of Work you handle, you may refer to more than one Service Function. Select the ones that match your work.</p>
+      <div class="fn-grid" id="guide-functions"></div>
+    </div>
+
+    <div class="g-section">
+      <div class="g-section-head"><span class="g-badge">Step 2</span><h3>Functional competencies required for each Service Function</h3></div>
+      <p class="g-lead">The table shows the functional competencies you would need to perform your work in each Service Function. <span class="mark crit">&#10003;*</span> marks a critical competency, and <span class="mark">&#10003;</span> marks a relevant one.</p>
+      <div class="gc-scroll"><table class="gc-table" id="guide-comp-table"></table></div>
+      <div id="guide-comp-action" class="g-action"></div>
+    </div>
+
+    <div class="g-section">
+      <div class="g-section-head"><span class="g-badge">Step 3</span><h3>Competency levels</h3></div>
+      <p class="g-lead">Each functional competency has proficiency levels. They map to these designations and indicative work areas. Use your designation to find your level, then see the programmes pegged at it.</p>
+      <div class="lv-table" id="guide-levels"></div>
+    </div>
+
+  </section>
+
+  <!-- CASE STUDIES -->
+  <section class="view" id="view-cases">
+    <div class="subnav" role="tablist" aria-label="How to use sections">
+      <button role="tab" data-goto="guide" aria-selected="false">Step-by-step guide</button>
+      <button role="tab" data-goto="cases" aria-selected="true">Case studies</button>
+    </div>
+    <div class="hero" style="margin-bottom: 24px;">
+      <h2 style="font-size:28px;">Case studies</h2>
+      <p>Three worked examples that follow the steps in the guide. Each one starts with a short story, answers the four questions, and ends with the programmes that match, taken live from the current catalogue.</p>
+    </div>
+    <div class="case-picker" id="case-picker" role="tablist" aria-label="Choose a case study"></div>
+    <div id="case-body"></div>
+  </section>
+
+  <section class="view" id="view-matrix">
+    <div class="hero" style="margin-bottom: 22px;">
+      <h2 style="font-size:26px;">Competency &amp; level matrix</h2>
+      <p>A reference view for HR and programme owners: every active programme against every functional competency, at a glance. Not intended for day-to-day browsing by learners, see the catalogue on the home page for that.</p>
+      <p style="margin-top:10px;"><button class="link-btn" data-scroll-catalogue>&#8592; Back to all programmes</button></p>
+    </div>
+    <div class="matrix-filters">
+      <div class="search-field">
+        <span class="search-icon" aria-hidden="true">&#128269;</span>
+        <input type="text" id="matrix-search" placeholder="Search programmes by name">
+      </div>
+      <label class="sort-field">Competency
+        <select id="matrix-filter-comp"><option value="">All</option></select>
+      </label>
+      <label class="sort-field">Level
+        <select id="matrix-filter-level"><option value="">All</option></select>
+      </label>
+      <label class="sort-field">Modality
+        <select id="matrix-filter-modality"><option value="">All</option></select>
+      </label>
+      <label class="sort-field">Role
+        <select id="matrix-filter-role"><option value="">All</option></select>
+      </label>
+      <button class="btn btn-secondary btn-sm" id="matrix-reset">Reset filters</button>
+    </div>
+    <p class="result-count" id="matrix-count"></p>
+    <p class="matrix-hint">Scroll inside the table, up and down or sideways. The Programme and Modality columns, and the competency headings, stay in view.</p>
+    <div class="matrix-scroll">
+      <table class="matrix-table" id="matrix-table"></table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="sf-brand">
+      <div class="brand-mark" aria-hidden="true"><span class="a"></span><span class="b"></span></div>
+      <div>
+        <p class="sf-name">Service Training Roadmap Tool</p>
+        <p class="sf-by">An initiative by the Service and Operations Management (SOM) Team, Institute of Public Administration and Management (IPAM), Civil Service College.</p>
+      </div>
+    </div>
+    <div class="sf-contact">
+      <p class="sf-label">Found a bug?</p>
+      <p>Please contact Ms Sufiana at <a href="mailto:sufiana_safiena@cscollege.gov.sg">sufiana_safiena@cscollege.gov.sg</a></p>
+    </div>
+  </div>
+  <p class="sf-copy">&copy; <span id="sf-year">2026</span> Civil Service College. All Rights Reserved.</p>
+</footer>
+
+<input type="file" id="data-file" accept=".xlsx,.xls" hidden>
+<button class="to-top" id="to-top" aria-label="Back to top" title="Back to top"><span aria-hidden="true">&uarr;</span></button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-head">
+      <div class="modal-head-text">
+        <div class="modal-kicker" id="modal-kicker"></div>
+        <h3 id="modal-title"></h3>
+      </div>
+      <button class="modal-close" data-close-modal aria-label="Close">&times;</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pathway-overlay">
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="pathway-title">
+    <div class="modal-head"><h3 id="pathway-title">My pathway</h3><button class="modal-close" data-close-pathway aria-label="Close">&times;</button></div>
+    <div id="pathway-body"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="preset-overlay">
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="preset-modal-title">
+    <div class="modal-head"><h3 id="preset-modal-title"></h3><button class="modal-close" data-close-preset aria-label="Close">&times;</button></div>
+    <div id="preset-modal-body"></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
